@@ -2,11 +2,14 @@ require_relative './connect_4_player.rb'
 
 class Game
   def initialize
-    @players = [1, 2].map { |index| Player.new(index) }
+    @players = [0, 1].map { |index| Player.new(index) }
     @board = Array.new(6) { Array.new(7, '   ') }
+    @curr_player_index = 0
   end
 
   def take_turn
+    curr_player = @players[@curr_player_index]
+    puts "#{curr_player.name}, please select a column to place your token."
     display_board
   end
 
@@ -20,6 +23,3 @@ class Game
          " #{(1..7).map { |num| " #{num} " }.join(' ')} "
   end
 end
-
-game = Game.new
-game.take_turn
