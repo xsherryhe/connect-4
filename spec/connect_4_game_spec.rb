@@ -9,7 +9,53 @@ describe Game do
     allow(Player).to receive(:new).and_return(john, mary)
   end
 
+  describe '#initialize' do
+    it 'initializes two new players' do
+      expect(Player).to receive(:new).twice
+      game
+    end
+
+    it 'creates a board with an array of 6 rows and 7 columns' do
+      board = game.instance_variable_get(:@board)
+      expect(board).to eq([['   '] * 7] * 6)
+    end
+  end
+
+  describe '#play' do
+    context 'when the game is over' do
+      it 'does not execute the loop' do
+        game.instance_variable_set(:@game_over, true)
+        expect(game).not_to receive(:take_turn)
+        game.play
+      end
+    end
+
+    context 'when the game is over after one loop' do
+      it 'executes the loop only once' do
+        allow(game).to receive(:evaluate_game_over) { game.instance_variable_set(:@game_over, true) }
+        expect(game).to receive(:take_turn).once
+        game.play
+      end
+    end
+
+    context 'when the game is over after two loops' do
+      it 'executes the loop exactly twice' do
+        call_count = 0
+        allow(game).to receive(:evaluate_game_over) do
+          call_count += 1
+          game.instance_variable_set(:@game_over, true) if call_count == 2
+        end
+        expect(game).to receive(:take_turn).twice
+        game.play
+      end
+    end
+  end
+
   describe '#take_turn' do
+    before do
+      allow(game).to receive(:puts)
+    end
+
     it 'outputs instruction to current player' do
       expect(game).to receive(:puts).with(/John, please select a column to place your token./)
       game.take_turn
