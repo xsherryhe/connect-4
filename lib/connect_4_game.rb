@@ -7,10 +7,20 @@ class Game
     @curr_player_index = 0
   end
 
+  def play
+    until @game_over
+      take_turn
+      evaluate_game_over
+    end
+  end
+
   def take_turn
     curr_player = @players[@curr_player_index]
     puts "#{curr_player.name}, please select a column to place your token."
     display_board
+  end
+
+  def evaluate_game_over
   end
 
   private
