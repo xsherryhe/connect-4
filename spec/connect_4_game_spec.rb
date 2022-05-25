@@ -125,10 +125,7 @@ describe Game do
 
     context 'when the selected column is partly filled' do
       it 'fills the next slot in the selected column' do
-        bottom_2 = expected_board.last(2)
-        p bottom_2
-        bottom_2.each { |row| row[3] = 'X' }
-        p expected_board
+        expected_board.last(2).each { |row| row[3] = 'X' }
         game.instance_variable_set(:@board, expected_board)
         allow(game).to receive(:gets).and_return('4')
         game.take_turn
@@ -138,6 +135,7 @@ describe Game do
     end
 
     it 'switches next player to current player' do
+      allow(game).to receive(:gets).and_return('5')
       game.take_turn
       index = game.instance_variable_get(:@curr_player_index)
       expect(index).to eq(1)
@@ -146,6 +144,7 @@ describe Game do
     context 'when the current player is the second player' do
       before do
         game.instance_variable_set(:@curr_player_index, 1)
+        allow(game).to receive(:gets).and_return('6')
       end
 
       it "outputs instruction with the correct current player's name" do
@@ -154,7 +153,6 @@ describe Game do
       end
 
       it "fills the slot with the correct current player's marker" do
-        allow(game).to receive(:gets).and_return('6')
         game.take_turn
         expected_board[5][5] = "\e[34m\u2B24\e[0m"
         expect(board).to eq(expected_board)
