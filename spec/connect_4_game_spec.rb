@@ -3,7 +3,6 @@ require_relative '../lib/connect_4_game.rb'
 describe Game do
   subject(:game) { described_class.new }
   let(:board) { game.instance_variable_get(:@board) }
-  let(:expected_board) { [['   '] * 7] * 6 }
 
   before do
     john = instance_double(Player, name: 'John', marker: "\e[31m\u2B24\e[0m")
@@ -18,7 +17,7 @@ describe Game do
     end
 
     it 'creates a board with an array of 6 rows and 7 columns' do
-      expect(board).to eq(expected_board)
+      expect(board).to eq([['   '] * 7] * 6)
     end
   end
 
@@ -58,11 +57,14 @@ describe Game do
   end
 
   describe '#take_turn' do
+    let(:expected_board) { Array.new(6) { Array.new(7, '   ') } }
+
     before do
       allow(game).to receive(:puts)
     end
 
     it 'outputs instruction to current player' do
+      allow(game).to receive(:gets).and_return('5')
       expect(game).to receive(:puts).with(/John, please enter a column number to place your token./)
       game.take_turn
     end
@@ -88,7 +90,7 @@ describe Game do
 
     it 'outputs the appropriate error message depending on the error' do
       game.instance_variable_set(:@board, [['X'] + ['   '] * 6] * 6)
-      allow(game).to receive(:gets).and_return('1', '1', '1', 'foo', '37', '5')
+      allow(game).to receive(:gets).and_return('1', '1', 'foo', '1', '37', '5')
       expect(game).to receive(:puts).with(/The column you selected is full. Please select a different column number./).exactly(3).times
       expect(game).to receive(:puts).with(/Please enter a column number between 1 and 7./).twice
       game.take_turn
@@ -123,7 +125,10 @@ describe Game do
 
     context 'when the selected column is partly filled' do
       it 'fills the next slot in the selected column' do
-        expected_board.last(2).each { |row| row[3] = 'X' }
+        bottom_2 = expected_board.last(2)
+        p bottom_2
+        bottom_2.each { |row| row[3] = 'X' }
+        p expected_board
         game.instance_variable_set(:@board, expected_board)
         allow(game).to receive(:gets).and_return('4')
         game.take_turn
