@@ -67,26 +67,28 @@ describe Game do
   end
 
   describe '#take_turn' do
-    5.times do
-      before do
-        allow(game).to receive(:puts)
-      end
+    before do
+      allow(game).to receive(:puts)
+      game.instance_variable_set(:@curr_player_index, random_player_index)
+    end
 
+    10.times do
       it 'outputs instruction to current player' do
         allow(game).to receive(:gets).and_return(random_column_input)
-        expect(game).to receive(:puts).with(/John, please enter a column number to place your token./)
+        player_name = %w[John Mary][random_player_index]
+        expect(game).to receive(:puts).with("#{player_name}, please enter a column number to place your token.")
         game.take_turn
       end
 
       it 'outputs error message while input is not a number' do
         allow(game).to receive(:gets).and_return('d', '@', '*', '(()))', 'hello world', random_column_input)
-        expect(game).to receive(:puts).with(/Please enter a column number between 1 and 7./).exactly(5).times
+        expect(game).to receive(:puts).with('Please enter a column number between 1 and 7.').exactly(5).times
         game.take_turn
       end
 
       it 'outputs error message while input is out of range' do
         allow(game).to receive(:gets).and_return('24', '0', '8', random_column_input)
-        expect(game).to receive(:puts).with(/Please enter a column number between 1 and 7./).exactly(3).times
+        expect(game).to receive(:puts).with('Please enter a column number between 1 and 7.').exactly(3).times
         game.take_turn
       end
 
@@ -97,7 +99,7 @@ describe Game do
         board_config[0][unfilled_column - 1] = '   '
         game.instance_variable_set(:@board, board_config)
         allow(game).to receive(:gets).and_return(filled_column.to_s, unfilled_column.to_s)
-        expect(game).to receive(:puts).with(/The column you selected is full. Please select a different column number./).once
+        expect(game).to receive(:puts).with('The column you selected is full. Please select a different column number.').once
         game.take_turn
       end
 
@@ -108,8 +110,8 @@ describe Game do
         board_config[0][unfilled_column - 1] = '   '
         game.instance_variable_set(:@board, board_config)
         allow(game).to receive(:gets).and_return(filled_column.to_s, filled_column.to_s, 'foo', filled_column.to_s, '37', unfilled_column.to_s)
-        expect(game).to receive(:puts).with(/The column you selected is full. Please select a different column number./).exactly(3).times
-        expect(game).to receive(:puts).with(/Please enter a column number between 1 and 7./).twice
+        expect(game).to receive(:puts).with('The column you selected is full. Please select a different column number.').exactly(3).times
+        expect(game).to receive(:puts).with('Please enter a column number between 1 and 7.').twice
         game.take_turn
       end
 
@@ -119,7 +121,7 @@ describe Game do
         allow(game).to receive(:gets).and_return(random_column_input)
         game.take_turn
         next_row = board_config.rindex { |row| row[random_column_input.to_i - 1] == '   ' }
-        board_config[next_row][random_column_input.to_i - 1] = " \e[31m\u2B24\e[0m "
+        board_config[next_row][random_column_input.to_i - 1] = [" \e[31m\u2B24\e[0m ", " \e[34m\u2B24\e[0m "][random_player_index]
         expect(board).to eq(board_config)
       end
 
@@ -127,34 +129,7 @@ describe Game do
         allow(game).to receive(:gets).and_return(random_column_input)
         game.take_turn
         index = game.instance_variable_get(:@curr_player_index)
-        expect(index).to eq(1)
-      end
-
-      context 'when the current player is the second player' do
-        before do
-          game.instance_variable_set(:@curr_player_index, 1)
-          allow(game).to receive(:gets).and_return(random_column_input)
-        end
-
-        it "outputs instruction with the correct current player's name" do
-          expect(game).to receive(:puts).with(/Mary, please enter a column number to place your token./)
-          game.take_turn
-        end
-
-        it "fills the slot with the correct current player's marker" do
-          board_config[0][random_column_input.to_i - 1] = '   '
-          game.instance_variable_set(:@board, Array.new(6) { |i| board_config[i].dup })
-          game.take_turn
-          next_row = board_config.rindex { |row| row[random_column_input.to_i - 1] == '   ' }
-          board_config[next_row][random_column_input.to_i - 1] = " \e[34m\u2B24\e[0m "
-          expect(board).to eq(board_config)
-        end
-
-        it 'switches next player to current player' do
-          game.take_turn
-          index = game.instance_variable_get(:@curr_player_index)
-          expect(index).to eq(0)
-        end
+        expect(index).to eq([1, 0][random_player_index])
       end
     end
   end
