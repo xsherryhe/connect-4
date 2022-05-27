@@ -13,6 +13,9 @@ describe Game do
     random_board
   end
   let(:random_column_input) { rand(1..7).to_s }
+  let(:random_player_index) { rand(2) }
+  let(:random_player_name) { %w[John Mary][random_player_index] }
+  let(:random_player_marker) { [" \e[31m\u2B24\e[0m ", " \e[34m\u2B24\e[0m "][random_player_index] }
 
   before do
     john = instance_double(Player, name: 'John', marker: "\e[31m\u2B24\e[0m")
@@ -75,8 +78,7 @@ describe Game do
     10.times do
       it 'outputs instruction to current player' do
         allow(game).to receive(:gets).and_return(random_column_input)
-        player_name = %w[John Mary][random_player_index]
-        expect(game).to receive(:puts).with("#{player_name}, please enter a column number to place your token.")
+        expect(game).to receive(:puts).with("#{random_player_name}, please enter a column number to place your token.")
         game.take_turn
       end
 
@@ -121,7 +123,7 @@ describe Game do
         allow(game).to receive(:gets).and_return(random_column_input)
         game.take_turn
         next_row = board_config.rindex { |row| row[random_column_input.to_i - 1] == '   ' }
-        board_config[next_row][random_column_input.to_i - 1] = [" \e[31m\u2B24\e[0m ", " \e[34m\u2B24\e[0m "][random_player_index]
+        board_config[next_row][random_column_input.to_i - 1] = random_player_marker
         expect(board).to eq(board_config)
       end
 
@@ -135,12 +137,43 @@ describe Game do
   end
 
   describe '#evaluate_game_over' do
+    let(:game_over) { game.instance_variable_get(:@game_over) }
+    before do
+      allow(game).to receive(:puts)
+      game.instance_variable_set(:@curr_player_index, random_player_index)
+    end
+
     context 'when there is no win or tie' do
-      it 'does not change the game to be over' do
+      10.times do
+        it 'does not change the game to be over' do
+          board_config[0][random_column_input.to_i - 1] = '   '
+          game.instance_variable_set(:@board, board_config)
+          game.evaluate_game_over
+          expect(game_over).not_to be true
+        end
       end
     end
 
-    context 'when the first player wins' do
+    context 'when a player wins horizontally' do
+      before do
+        row = rand(6)
+        start_col = rand(4)
+        (start_col..start_col + 3).each { |col| board_config[row][col] = random_player_marker }
+        game.instance_variable_set(:@board, board_config)
+      end
+
+      it 'changes the game to be over' do
+        game.evaluate_game_over
+        expect(game_over).to be true
+      end
+
+      it "outputs a win message with the winning player's name" do
+        expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
+        game.evaluate_game_over
+      end
+    end
+
+    context 'when a player wins vertically' do
       it 'changes the game to be over' do
         
       end
@@ -148,9 +181,10 @@ describe Game do
       it "outputs a win message with the winning player's name" do
         
       end
+      
     end
 
-    context 'when the second player wins' do
+    context 'when a player wins diagonally' do
       it 'changes the game to be over' do
         
       end
