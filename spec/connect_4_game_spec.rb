@@ -3,6 +3,15 @@ require_relative '../lib/connect_4_game.rb'
 describe Game do
   subject(:game) { described_class.new }
   let(:board) { game.instance_variable_get(:@board) }
+  let(:board_config) do
+    random_board = Array.new(6) { Array.new(7, '   ') }
+    random_board.reverse.each_with_index do |row, i|
+      row.map!.with_index do |slot, j|
+        (i.zero? || random_board[6 - i][j] == 'X') && rand(10) < 5 ? 'X' : slot
+      end
+    end
+    random_board
+  end
   let(:random_column_input) { rand(1..7).to_s }
 
   before do
@@ -58,8 +67,6 @@ describe Game do
   end
 
   describe '#take_turn' do
-    let(:expected_board) { Array.new(6) { Array.new(7, '   ') } }
-
     before do
       allow(game).to receive(:puts)
     end
@@ -84,9 +91,10 @@ describe Game do
 
     it 'outputs error message while the selected column is full' do
       filled_column = rand(1..7)
-      expected_board.each { |row| row[filled_column - 1] = 'X' }
-      game.instance_variable_set(:@board, expected_board)
+      board_config.each { |row| row[filled_column - 1] = 'X' }
       unfilled_column = ((1..7).to_a - [filled_column]).sample
+      board_config[0][unfilled_column - 1] = '   '
+      game.instance_variable_set(:@board, board_config)
       allow(game).to receive(:gets).and_return(filled_column.to_s, unfilled_column.to_s)
       expect(game).to receive(:puts).with(/The column you selected is full. Please select a different column number./).once
       game.take_turn
@@ -94,40 +102,30 @@ describe Game do
 
     it 'outputs the appropriate error message depending on the error' do
       filled_column = rand(1..7)
-      expected_board.each { |row| row[filled_column - 1] = 'X' }
-      game.instance_variable_set(:@board, expected_board)
+      board_config.each { |row| row[filled_column - 1] = 'X' }
       unfilled_column = ((1..7).to_a - [filled_column]).sample
+      board_config[0][unfilled_column - 1] = '   '
+      game.instance_variable_set(:@board, board_config)
       allow(game).to receive(:gets).and_return(filled_column.to_s, filled_column.to_s, 'foo', filled_column.to_s, '37', unfilled_column.to_s)
       expect(game).to receive(:puts).with(/The column you selected is full. Please select a different column number./).exactly(3).times
       expect(game).to receive(:puts).with(/Please enter a column number between 1 and 7./).twice
       game.take_turn
     end
 
-    5.times do
+    10.times do
       it 'fills a slot in the selected column number' do
+        board_config[0][random_column_input.to_i - 1] = '   '
+        game.instance_variable_set(:@board, board_config)
         allow(game).to receive(:gets).and_return(random_column_input)
         game.take_turn
-        expected_board[5][random_column_input.to_i - 1] = "\e[31m\u2B24\e[0m"
-        expect(board).to eq(expected_board)
-      end
-    end
-
-    context 'when the selected column is partly filled' do
-      5.times do
-        it 'fills the next slot in the selected column' do
-          filled_rows = rand(1..5)
-          expected_board.last(filled_rows).each { |row| row[random_column_input.to_i - 1] = 'X' }
-          game.instance_variable_set(:@board, expected_board)
-          allow(game).to receive(:gets).and_return(random_column_input)
-          game.take_turn
-          expected_board[5 - filled_rows][random_column_input.to_i - 1] = "\e[31m\u2B24\e[0m"
-          expect(board).to eq(expected_board)
-        end
+        next_row = board_config.rindex { |row| row[random_column_input.to_i - 1] == '   ' }
+        board_config[next_row][random_column_input.to_i - 1] = "\e[31m\u2B24\e[0m"
+        expect(board).to eq(board_config)
       end
     end
 
     it 'switches next player to current player' do
-      allow(game).to receive(:gets).and_return('5')
+      allow(game).to receive(:gets).and_return(random_column_input)
       game.take_turn
       index = game.instance_variable_get(:@curr_player_index)
       expect(index).to eq(1)
@@ -144,11 +142,14 @@ describe Game do
         game.take_turn
       end
 
-      5.times do
+      10.times do
         it "fills the slot with the correct current player's marker" do
+          board_config[0][random_column_input.to_i - 1] = '   '
+          game.instance_variable_set(:@board, board_config)
           game.take_turn
-          expected_board[5][random_column_input.to_i - 1] = "\e[34m\u2B24\e[0m"
-          expect(board).to eq(expected_board)
+          next_row = board_config.rindex { |row| row[random_column_input.to_i - 1] == '   ' }
+          board_config[next_row][random_column_input.to_i - 1] = "\e[34m\u2B24\e[0m"
+          expect(board).to eq(board_config)
         end
       end
 
@@ -161,6 +162,37 @@ describe Game do
   end
 
   describe '#evaluate_game_over' do
-    
+    context 'when there is no win or tie' do
+      it 'does not change the game to be over' do
+      end
+    end
+
+    context 'when the first player wins' do
+      it 'changes the game to be over' do
+        
+      end
+
+      it "outputs a win message with the winning player's name" do
+        
+      end
+    end
+
+    context 'when the second player wins' do
+      it 'changes the game to be over' do
+        
+      end
+
+      it "outputs a win message with the winning player's name" do
+        
+      end
+    end
+
+    context 'when the game is tied (all columns full)' do
+      it 'changes the game to be over' do
+      end
+
+      it 'outputs a tie message' do
+      end
+    end
   end
 end
