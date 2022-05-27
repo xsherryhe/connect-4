@@ -22,7 +22,7 @@ class Game
     display_board
     puts "#{player.name}, please enter a column number to place your token."
     col = valid_input - 1
-    @board.reverse.find { |row| row[col] == '   ' }[col] = player.marker
+    @board.reverse.find { |row| row[col] == '   ' }[col] = " #{player.marker} "
     @curr_player_index ^= 1
   end
 
