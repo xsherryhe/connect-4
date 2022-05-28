@@ -162,43 +162,85 @@ describe Game do
         game.instance_variable_set(:@board, board_config)
       end
 
+      10.times do
+        it 'changes the game to be over' do
+          game.evaluate_game_over
+          expect(game_over).to be true
+        end
+
+        it "outputs a win message with the winning player's name" do
+          expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
+          game.evaluate_game_over
+        end
+      end
+    end
+
+    context 'when a player wins vertically' do
+      before do
+        start_row = rand(3)
+        (start_row..start_row + 3).each { |row| board_config[row][random_column_input] = random_player_marker }
+        game.instance_variable_set(:@board, board_config)
+      end
+
+      10.times do
+        it 'changes the game to be over' do
+          game.evaluate_game_over
+          expect(game_over).to be true
+        end
+
+        it "outputs a win message with the winning player's name" do
+          expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
+          game.evaluate_game_over
+        end
+      end
+    end
+
+    context 'when a player wins diagonally' do
+      before do
+        row = rand(6)
+        col = rand(7)
+        row_change, col_change = [row, col].map { |num| num < 3 ? 1 : -1 }
+        4.times do
+          board_config[row][col] = random_player_marker
+          row += row_change
+          col += col_change
+        end
+        game.instance_variable_set(:@board, board_config)
+      end
+
+      10.times do
+        it 'changes the game to be over' do
+          game.evaluate_game_over
+          expect(game_over).to be true
+        end
+
+        it "outputs a win message with the winning player's name" do
+          expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
+          game.evaluate_game_over
+        end
+      end
+    end
+
+    context 'when the game is tied (all columns full)' do
+      before do
+        tie_board = Array.new(6) do |i|
+          player_index = i.even? ? random_player_index : random_player_index ^ 1
+          Array.new(7) do
+            player_index ^= 1
+            [" \e[31m\u2B24\e[0m ", " \e[34m\u2B24\e[0m "][player_index]
+          end
+        end
+        game.instance_variable_set(:@board, tie_board)
+      end
+
       it 'changes the game to be over' do
         game.evaluate_game_over
         expect(game_over).to be true
       end
 
-      it "outputs a win message with the winning player's name" do
-        expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
-        game.evaluate_game_over
-      end
-    end
-
-    context 'when a player wins vertically' do
-      it 'changes the game to be over' do
-        
-      end
-
-      it "outputs a win message with the winning player's name" do
-        
-      end
-      
-    end
-
-    context 'when a player wins diagonally' do
-      it 'changes the game to be over' do
-        
-      end
-
-      it "outputs a win message with the winning player's name" do
-        
-      end
-    end
-
-    context 'when the game is tied (all columns full)' do
-      it 'changes the game to be over' do
-      end
-
       it 'outputs a tie message' do
+        expect(game).to receive(:puts).with('The game ends with a tie.')
+        game.evaluate_game_over
       end
     end
   end
