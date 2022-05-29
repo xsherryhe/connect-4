@@ -1,10 +1,14 @@
 module GameOver
   def evaluate_game_over
-    return unless winning_player
+    winner = winning_player
+    return unless winner || tie
 
-    display_board
     @game_over = true
-    puts "#{winning_player.name} has won the game!"
+    if winner
+      puts "#{winner.name} has won the game!"
+    else
+      puts 'The game ends with a tie.'
+    end
   end
 
   private
@@ -40,5 +44,9 @@ module GameOver
           @board[new_row][new_col].include?(player.marker)
       end
     end
+  end
+
+  def tie
+    @board.none? { |row| row.include?('   ') }
   end
 end

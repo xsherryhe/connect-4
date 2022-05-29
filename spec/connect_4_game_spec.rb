@@ -225,20 +225,20 @@ describe Game do
       before do
         tie_board = Array.new(6) do |i|
           player_index = i.even? ? random_player_index : random_player_index ^ 1
-          Array.new(7) do
-            player_index ^= 1
+          Array.new(7) do |j|
+            player_index ^= 1 if j.even?
             [" \e[31m\u2B24\e[0m ", " \e[34m\u2B24\e[0m "][player_index]
           end
         end
         game.instance_variable_set(:@board, tie_board)
       end
 
-      xit 'changes the game to be over' do
+      it 'changes the game to be over' do
         game.evaluate_game_over
         expect(game_over).to be true
       end
 
-      xit 'outputs a tie message' do
+      it 'outputs a tie message' do
         expect(game).to receive(:puts).with('The game ends with a tie.')
         game.evaluate_game_over
       end
