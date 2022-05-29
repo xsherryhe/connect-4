@@ -209,12 +209,12 @@ describe Game do
       end
 
       10.times do
-        xit 'changes the game to be over' do
+        it 'changes the game to be over' do
           game.evaluate_game_over
           expect(game_over).to be true
         end
 
-        xit "outputs a win message with the winning player's name" do
+        it "outputs a win message with the winning player's name" do
           expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
           game.evaluate_game_over
         end
