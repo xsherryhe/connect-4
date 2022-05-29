@@ -1,8 +1,10 @@
 require_relative './connect_4_player.rb'
 require_relative './connect_4_input.rb'
+require_relative './connect_4_game_over.rb'
 
 class Game
   include Input
+  include GameOver
 
   def initialize
     @players = [0, 1].map { |index| Player.new(index) }
@@ -24,9 +26,6 @@ class Game
     col = valid_input - 1
     @board.reverse.find { |row| row[col] == '   ' }[col] = " #{player.marker} "
     @curr_player_index ^= 1
-  end
-
-  def evaluate_game_over
   end
 
   private

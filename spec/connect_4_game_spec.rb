@@ -183,12 +183,12 @@ describe Game do
       end
 
       10.times do
-        it 'changes the game to be over' do
+        xit 'changes the game to be over' do
           game.evaluate_game_over
           expect(game_over).to be true
         end
 
-        it "outputs a win message with the winning player's name" do
+        xit "outputs a win message with the winning player's name" do
           expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
           game.evaluate_game_over
         end
@@ -209,12 +209,12 @@ describe Game do
       end
 
       10.times do
-        it 'changes the game to be over' do
+        xit 'changes the game to be over' do
           game.evaluate_game_over
           expect(game_over).to be true
         end
 
-        it "outputs a win message with the winning player's name" do
+        xit "outputs a win message with the winning player's name" do
           expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
           game.evaluate_game_over
         end
@@ -233,12 +233,12 @@ describe Game do
         game.instance_variable_set(:@board, tie_board)
       end
 
-      it 'changes the game to be over' do
+      xit 'changes the game to be over' do
         game.evaluate_game_over
         expect(game_over).to be true
       end
 
-      it 'outputs a tie message' do
+      xit 'outputs a tie message' do
         expect(game).to receive(:puts).with('The game ends with a tie.')
         game.evaluate_game_over
       end
