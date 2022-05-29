@@ -178,17 +178,17 @@ describe Game do
     context 'when a player wins vertically' do
       before do
         start_row = rand(3)
-        (start_row..start_row + 3).each { |row| board_config[row][random_column_input] = random_player_marker }
+        (start_row..start_row + 3).each { |row| board_config[row][random_column_input.to_i - 1] = random_player_marker }
         game.instance_variable_set(:@board, board_config)
       end
 
       10.times do
-        xit 'changes the game to be over' do
+        it 'changes the game to be over' do
           game.evaluate_game_over
           expect(game_over).to be true
         end
 
-        xit "outputs a win message with the winning player's name" do
+        it "outputs a win message with the winning player's name" do
           expect(game).to receive(:puts).with("#{random_player_name} has won the game!")
           game.evaluate_game_over
         end
