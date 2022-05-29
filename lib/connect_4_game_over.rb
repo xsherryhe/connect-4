@@ -3,6 +3,7 @@ module GameOver
     winner = winning_player
     return unless winner || tie
 
+    display_board
     @game_over = true
     if winner
       puts "#{winner.name} has won the game!"
@@ -24,7 +25,8 @@ module GameOver
   def winning_config(config, player)
     config.any? do |row|
       (0..3).any? do |col|
-        row[col..col + 3].all? { |slot| slot.include?(player.marker) }
+        rows = row[col..col + 3]
+        rows.size == 4 && rows.all? { |slot| slot.include?(player.marker) }
       end
     end
   end
