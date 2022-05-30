@@ -1,13 +1,14 @@
-require_relative './connect_4_run.rb'
+require_relative '../lib/connect_4.rb'
 
 describe Connect4 do
   describe '.run' do
     let(:yes) { %w[YES Yes yes Y y].sample }
     let(:no) { %w[NO No no N n].sample }
+    let(:game) { instance_double(Game) }
 
     before do
       allow(described_class).to receive(:puts)
-      allow(Game).to receive(:new)
+      allow(Game).to receive(:new).and_return(game)
     end
 
     context 'when the user does not ask to start a new game' do
@@ -21,8 +22,9 @@ describe Connect4 do
           described_class.run
         end
 
-        it 'does not initialize a new game' do
+        it 'does not initialize or run a new game' do
           expect(Game).not_to receive(:new)
+          expect(game).not_to receive(:play)
           described_class.run
         end
       end
@@ -39,8 +41,9 @@ describe Connect4 do
           described_class.run
         end
 
-        it 'initializes exactly one new game' do
+        it 'initializes and runs exactly one new game' do
           expect(Game).to receive(:new).once
+          expect(game).to receive(:play).once
           described_class.run
         end
       end
@@ -64,16 +67,26 @@ describe Connect4 do
 
         it 'initializes the corresponding number of new games' do
           expect(Game).to receive(:new).exactly(games).times
+          expect(game).to receive(:play).exactly(games).times
           described_class.run
         end
       end
     end
 
     context 'when the user inputs something besides y/yes or n/no in response to the prompt' do
+      before do
+        allow(described_class).to receive(:gets).and_return(%w[7 hello @ 23 )].sample)
+      end
+
       10.times do
-        it 'does not initialize a new game' do
-          allow(described_class).to receive(:gets).and_return(%w[7 hello @ 23 )].sample)
+        it 'prompts the user about starting a game exactly once' do
+          expect(described_class).to receive(:puts).with('Start a new game? (Y/N)').once
+          described_class.run
+        end
+
+        it 'does not initialize or run a new game' do
           expect(Game).not_to receive(:new)
+          expect(game).not_to receive(:play)
           described_class.run
         end
       end
