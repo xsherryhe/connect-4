@@ -67,6 +67,21 @@ describe Game do
         game.play
       end
     end
+
+    context 'when the game is over after a random number of loops' do
+      10.times do
+        it 'executes the loop the corresponding number of times' do
+          loops = rand(100)
+          call_count = 0
+          allow(game).to receive(:evaluate_game_over) do
+            call_count += 1
+            game.instance_variable_set(:@game_over, true) if call_count == loops
+          end
+          expect(game).to receive(:take_turn).exactly(loops).times
+          game.play
+        end
+      end
+    end
   end
 
   describe '#take_turn' do
