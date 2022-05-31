@@ -9,6 +9,7 @@ describe Connect4 do
     before do
       allow(described_class).to receive(:puts)
       allow(Game).to receive(:new).and_return(game)
+      allow(game).to receive(:play)
     end
 
     context 'when the user does not ask to start a new game' do
@@ -50,12 +51,12 @@ describe Connect4 do
     end
 
     context 'when the user asks to play a random number of games' do
+      let(:games) { rand(100) }
       before do
-        games = rand(100)
         call_count = 0
         allow(described_class).to receive(:gets) do
           call_count += 1
-          call_count == games ? no : yes
+          call_count == games + 1 ? no : yes
         end
       end
 
