@@ -28,6 +28,11 @@ describe Connect4 do
           expect(game).not_to receive(:play)
           described_class.run
         end
+
+        it 'outputs a goodbye message' do
+          expect(described_class).to receive(:puts).with(/bye/)
+          described_class.run
+        end
       end
     end
 
@@ -45,6 +50,11 @@ describe Connect4 do
         it 'initializes and runs exactly one new game' do
           expect(Game).to receive(:new).once
           expect(game).to receive(:play).once
+          described_class.run
+        end
+
+        it 'outputs a goodbye message' do
+          expect(described_class).to receive(:puts).with(/bye/)
           described_class.run
         end
       end
@@ -71,6 +81,11 @@ describe Connect4 do
           expect(game).to receive(:play).exactly(games).times
           described_class.run
         end
+
+        it 'outputs a goodbye message' do
+          expect(described_class).to receive(:puts).with(/bye/)
+          described_class.run
+        end
       end
     end
 
@@ -88,6 +103,11 @@ describe Connect4 do
         it 'does not initialize or run a new game' do
           expect(Game).not_to receive(:new)
           expect(game).not_to receive(:play)
+          described_class.run
+        end
+
+        it 'outputs a goodbye message' do
+          expect(described_class).to receive(:puts).with(/bye/)
           described_class.run
         end
       end

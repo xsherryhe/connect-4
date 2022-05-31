@@ -4,7 +4,10 @@ module Connect4
   def self.run
     loop do
       puts 'Start a new game? (Y/N)'
-      break unless gets.chomp =~ /yes|y/i
+      unless gets.chomp =~ /yes|y/i
+        puts 'Okay, bye!'
+        break
+      end
 
       game = Game.new
       game.play
