@@ -2,4 +2,4 @@ This project is a program that allows two human players to play Connect 4 game o
 
 The project is primarily intended as practice for TDD.
 
-This project is currently in progress.
+Run this project [here](https://replit.com/@xsherryhe/connect-4).
