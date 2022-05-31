@@ -1,4 +1,6 @@
 module Input
+  private
+
   def valid_input
     input = gets.chomp.to_i
     while out_range(input) || filled_column(input)
